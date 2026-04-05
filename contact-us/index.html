@@ -143,7 +143,6 @@
 
         input[type="text"],
         input[type="email"],
-        select,
         textarea {
             width: 100%;
             padding: 0.75rem 1rem;
@@ -157,26 +156,46 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
 
+
         input::placeholder,
         textarea::placeholder {
             color: var(--muted2);
         }
 
         input:focus,
-        select:focus,
         textarea:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.2);
             background: rgba(0, 0, 0, 0.45);
         }
 
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(100, 149, 237, 0.2);
+            background-color: #030308;
+        }
+
         select {
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            font: inherit;
+            font-size: 1rem;
+            color: var(--text);
             cursor: pointer;
             appearance: none;
+            background-color: #06060a;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0a0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 1rem center;
-            padding-right: 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        select option {
+            background-color: #06060a;
+            color: var(--text);
         }
 
         textarea {
@@ -277,6 +296,7 @@
                         <option value="Feature Request">Feature request</option>
                         <option value="Bug Report">Bug report</option>
                         <option value="Feedback">Feedback</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
                 <div class="field">
@@ -294,9 +314,9 @@
 
     <footer>
         <nav aria-label="Legal">
-            <a href="privacy_policy.html">Privacy Policy</a>
+            <a href="https://legal.swappd.app/privacy_policy">Privacy Policy</a>
             <span aria-hidden="true">·</span>
-            <a href="TOS_page.html">Terms of Service</a>
+            <a href="https://legal.swappd.app/tos">Terms of Service</a>
         </nav>
         <p class="home"><a href="https://www.swappd.app">swappd.app</a></p>
     </footer>
@@ -330,4 +350,3 @@
     </script>
 </body>
 </html>
-
