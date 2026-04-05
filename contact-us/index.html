@@ -227,6 +227,38 @@
             transform: translateY(0);
         }
 
+        button[type="submit"]:disabled {
+            cursor: default;
+            opacity: 0.92;
+        }
+
+        button[type="submit"]:disabled:hover,
+        button[type="submit"]:disabled:active {
+            transform: none;
+            box-shadow: none;
+        }
+
+        button[type="submit"].submit-success {
+            animation: submitSuccessPulse 0.75s ease-out;
+            background: linear-gradient(135deg, rgba(55, 145, 105, 0.95), rgba(32, 85, 62, 0.98));
+            border-color: rgba(120, 220, 170, 0.35);
+        }
+
+        @keyframes submitSuccessPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(100, 200, 150, 0.45);
+            }
+            35% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 10px rgba(100, 200, 150, 0.12);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+            }
+        }
+
         .backup {
             margin-top: 1.75rem;
             padding-top: 1.5rem;
@@ -303,7 +335,7 @@
                     <label for="message">Message</label>
                     <textarea id="message" name="message" placeholder="Tell us what’s going on…" required></textarea>
                 </div>
-                <button type="submit">Send via email</button>
+                <button type="submit" id="support-submit">Send via email</button>
             </form>
 
             <p class="backup">
@@ -324,12 +356,22 @@
     <script>
         (function () {
             var form = document.getElementById('support-form');
+            var submitBtn = document.getElementById('support-submit');
+            var submitLabelDefault = submitBtn.textContent;
+            var resetTimer = null;
+
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
                 if (!form.checkValidity()) {
                     form.reportValidity();
                     return;
                 }
+
+                if (resetTimer) {
+                    clearTimeout(resetTimer);
+                    resetTimer = null;
+                }
+
                 var name = document.getElementById('name').value.trim();
                 var email = document.getElementById('email').value.trim();
                 var topic = document.getElementById('topic').value;
@@ -337,14 +379,34 @@
 
                 var subject = '[' + topic + '] Swappd support — ' + name;
                 var body =
-                    'Topic: ' + topic + '\n\n' +
-                    'Name: ' + name + '\n' +
-                    'Email: ' + email + '\n\n' +
-                    'Message:\n' + message;
+                    'Topic: ' + topic + '\r\n\r\n' +
+                    'Name: ' + name + '\r\n' +
+                    'Email: ' + email + '\r\n\r\n' +
+                    'Message:\r\n' + message;
 
-                window.location.href =
+                var mailto =
                     'mailto:alex@swappd.app?subject=' + encodeURIComponent(subject) +
                     '&body=' + encodeURIComponent(body);
+
+                window.location.href = mailto;
+
+                form.reset();
+                if (document.activeElement && form.contains(document.activeElement)) {
+                    document.activeElement.blur();
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.classList.remove('submit-success');
+                void submitBtn.offsetWidth;
+                submitBtn.classList.add('submit-success');
+                submitBtn.textContent = 'Opening your mail app…';
+
+                resetTimer = setTimeout(function () {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = submitLabelDefault;
+                    submitBtn.classList.remove('submit-success');
+                    resetTimer = null;
+                }, 2600);
             });
         })();
     </script>
