@@ -132,6 +132,43 @@
             margin-bottom: 1.25rem;
         }
 
+        .field-grid {
+            display: grid;
+            gap: 0.9rem;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        @media (max-width: 600px) {
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .parts-request-fields,
+        .wheel-details {
+            display: none;
+        }
+
+        .parts-request-fields.is-visible,
+        .wheel-details.is-visible {
+            display: block;
+        }
+
+        .parts-request-fields {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .parts-request-title {
+            margin-bottom: 0.8rem;
+            color: var(--text);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
         label {
             display: block;
             font-size: 0.875rem;
@@ -328,8 +365,44 @@
                         <option value="Feature Request">Feature request</option>
                         <option value="Bug Report">Bug report</option>
                         <option value="Feedback">Feedback</option>
+                        <option value="Parts Request">Parts request</option>
                         <option value="Other">Other</option>
                     </select>
+                </div>
+                <div class="parts-request-fields" id="parts-request-fields" aria-live="polite">
+                    <p class="parts-request-title">Parts request details</p>
+                    <div class="field">
+                        <label for="part-type">Part type</label>
+                        <select id="part-type" name="partType">
+                            <option value="" selected>Select a part type</option>
+                            <option value="Wheels">Wheels</option>
+                            <option value="Front lips">Front lips</option>
+                            <option value="Rear Diffusers">Rear Diffusers</option>
+                            <option value="Side Skirts">Side Skirts</option>
+                        </select>
+                    </div>
+                    <div class="field-grid">
+                        <div class="field">
+                            <label for="manufacturer">Manufacturer</label>
+                            <input type="text" id="manufacturer" name="manufacturer" placeholder="e.g. Rays, Varis, Maxton">
+                        </div>
+                        <div class="field">
+                            <label for="part-model">Model</label>
+                            <input type="text" id="part-model" name="partModel" placeholder="Specific part model">
+                        </div>
+                    </div>
+                    <div class="wheel-details" id="wheel-details">
+                        <div class="field-grid">
+                            <div class="field">
+                                <label for="wheel-colour">Wheel colour (optional)</label>
+                                <input type="text" id="wheel-colour" name="wheelColour" placeholder="e.g. Matte bronze">
+                            </div>
+                            <div class="field">
+                                <label for="wheel-size">Wheel size (optional)</label>
+                                <input type="text" id="wheel-size" name="wheelSize" placeholder="e.g. 18in, 19in ">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="field">
                     <label for="message">Message</label>
@@ -358,7 +431,48 @@
             var form = document.getElementById('support-form');
             var submitBtn = document.getElementById('support-submit');
             var submitLabelDefault = submitBtn.textContent;
+            var topicSelect = document.getElementById('topic');
+            var partTypeSelect = document.getElementById('part-type');
+            var partsRequestFields = document.getElementById('parts-request-fields');
+            var wheelDetails = document.getElementById('wheel-details');
+            var manufacturerInput = document.getElementById('manufacturer');
+            var partModelInput = document.getElementById('part-model');
+            var wheelColourInput = document.getElementById('wheel-colour');
+            var wheelSizeInput = document.getElementById('wheel-size');
             var resetTimer = null;
+
+            function updateWheelDetailsVisibility() {
+                var isWheelRequest = partTypeSelect.value === 'Wheels';
+                wheelDetails.classList.toggle('is-visible', isWheelRequest);
+
+                if (!isWheelRequest) {
+                    wheelColourInput.value = '';
+                    wheelSizeInput.value = '';
+                }
+            }
+
+            function updatePartsRequestVisibility() {
+                var isPartsRequest = topicSelect.value === 'Parts Request';
+                partsRequestFields.classList.toggle('is-visible', isPartsRequest);
+
+                partTypeSelect.required = isPartsRequest;
+                manufacturerInput.required = isPartsRequest;
+                partModelInput.required = isPartsRequest;
+
+                if (!isPartsRequest) {
+                    partTypeSelect.value = '';
+                    manufacturerInput.value = '';
+                    partModelInput.value = '';
+                    wheelColourInput.value = '';
+                    wheelSizeInput.value = '';
+                    wheelDetails.classList.remove('is-visible');
+                }
+            }
+
+            topicSelect.addEventListener('change', updatePartsRequestVisibility);
+            partTypeSelect.addEventListener('change', updateWheelDetailsVisibility);
+            updatePartsRequestVisibility();
+            updateWheelDetailsVisibility();
 
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
@@ -376,12 +490,30 @@
                 var email = document.getElementById('email').value.trim();
                 var topic = document.getElementById('topic').value;
                 var message = document.getElementById('message').value.trim();
+                var partType = partTypeSelect.value;
+                var manufacturer = manufacturerInput.value.trim();
+                var partModel = partModelInput.value.trim();
+                var wheelColour = wheelColourInput.value.trim();
+                var wheelSize = wheelSizeInput.value.trim();
+                var isPartsRequest = topic === 'Parts Request';
+                var isWheelRequest = partType === 'Wheels';
 
                 var subject = '[' + topic + '] Swappd support — ' + name;
                 var body =
                     'Topic: ' + topic + '\r\n\r\n' +
                     'Name: ' + name + '\r\n' +
                     'Email: ' + email + '\r\n\r\n' +
+                    (isPartsRequest
+                        ? (
+                            'Parts request details:\r\n' +
+                            'Part type: ' + partType + '\r\n' +
+                            'Manufacturer: ' + manufacturer + '\r\n' +
+                            'Model: ' + partModel + '\r\n' +
+                            (isWheelRequest && wheelColour ? 'Wheel colour: ' + wheelColour + '\r\n' : '') +
+                            (isWheelRequest && wheelSize ? 'Wheel size: ' + wheelSize + '\r\n' : '') +
+                            '\r\n'
+                        )
+                        : '') +
                     'Message:\r\n' + message;
 
                 var mailto =
