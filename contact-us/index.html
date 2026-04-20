@@ -404,7 +404,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="field">
+                <div class="field" id="message-field">
                     <label for="message">Message</label>
                     <textarea id="message" name="message" placeholder="Tell us what’s going on…" required></textarea>
                 </div>
@@ -435,6 +435,8 @@
             var partTypeSelect = document.getElementById('part-type');
             var partsRequestFields = document.getElementById('parts-request-fields');
             var wheelDetails = document.getElementById('wheel-details');
+            var messageField = document.getElementById('message-field');
+            var messageInput = document.getElementById('message');
             var manufacturerInput = document.getElementById('manufacturer');
             var partModelInput = document.getElementById('part-model');
             var wheelColourInput = document.getElementById('wheel-colour');
@@ -454,10 +456,12 @@
             function updatePartsRequestVisibility() {
                 var isPartsRequest = topicSelect.value === 'Parts Request';
                 partsRequestFields.classList.toggle('is-visible', isPartsRequest);
+                messageField.style.display = isPartsRequest ? 'none' : 'block';
 
                 partTypeSelect.required = isPartsRequest;
                 manufacturerInput.required = isPartsRequest;
                 partModelInput.required = isPartsRequest;
+                messageInput.required = !isPartsRequest;
 
                 if (!isPartsRequest) {
                     partTypeSelect.value = '';
@@ -466,6 +470,8 @@
                     wheelColourInput.value = '';
                     wheelSizeInput.value = '';
                     wheelDetails.classList.remove('is-visible');
+                } else {
+                    messageInput.value = '';
                 }
             }
 
@@ -489,7 +495,7 @@
                 var name = document.getElementById('name').value.trim();
                 var email = document.getElementById('email').value.trim();
                 var topic = document.getElementById('topic').value;
-                var message = document.getElementById('message').value.trim();
+                var message = messageInput.value.trim();
                 var partType = partTypeSelect.value;
                 var manufacturer = manufacturerInput.value.trim();
                 var partModel = partModelInput.value.trim();
@@ -514,7 +520,7 @@
                             '\r\n'
                         )
                         : '') +
-                    'Message:\r\n' + message;
+                    (isPartsRequest ? '' : 'Message:\r\n' + message);
 
                 var mailto =
                     'mailto:alex@swappd.app?subject=' + encodeURIComponent(subject) +
