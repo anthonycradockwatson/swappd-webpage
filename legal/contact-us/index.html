@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support — Swappd</title>
+    <title>Swappd</title>
     <style>
         * {
             margin: 0;
@@ -58,6 +58,41 @@
 
         a:hover {
             color: var(--link-hover);
+        }
+
+        .site-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px 20px;
+            background: rgba(11, 11, 16, 0.9);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .site-logo {
+            display: inline-flex;
+            align-items: center;
+            line-height: 0;
+            border-radius: 10px;
+            transition: opacity 0.2s ease;
+        }
+
+        .site-logo:hover {
+            opacity: 0.88;
+        }
+
+        .site-logo img {
+            height: 34px;
+            width: auto;
+            max-width: 132px;
+            object-fit: contain;
+            border-radius: 10px;
+            display: block;
         }
 
         header {
@@ -342,9 +377,14 @@
     </style>
 </head>
 <body>
+    <div class="site-topbar">
+        <a href="https://www.swappd.app" class="site-logo" aria-label="Swappd — home">
+            <img src="../../assets/swappd_logo.jpg" alt="" width="140" height="36" decoding="async">
+        </a>
+    </div>
     <header>
         <h1>Swappd Support</h1>
-        <p>Get in touch — we read every message.</p>
+        <p>Get in touch, we read every message.</p>
     </header>
 
     <main>
@@ -412,16 +452,16 @@
             </form>
 
             <p class="backup">
-                Prefer email directly? Reach us at <strong><a href="mailto:alex@swappd.app">alex@swappd.app</a></strong>.
+                Prefer email directly? Reach us at <strong>alex@swappd.app</strong>.
             </p>
         </div>
     </main>
 
     <footer>
         <nav aria-label="Legal">
-            <a href="https://legal.swappd.app/privacy_policy">Privacy Policy</a>
+            <a href="https://www.swappd.app/legal/privacy_policy">Privacy Policy</a>
             <span aria-hidden="true">·</span>
-            <a href="https://legal.swappd.app/tos">Terms of Service</a>
+            <a href="https://www.swappd.app/legal/tos">Terms of Service</a>
         </nav>
         <p class="home"><a href="https://www.swappd.app">swappd.app</a></p>
     </footer>
