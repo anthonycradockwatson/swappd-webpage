@@ -19,8 +19,8 @@
             --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
             /* Backgrounds: ../assets only, tuned to native aspect + section shape */
             --img-hero: url("assets/car_side_on_dark.jpg");           /* 4480×6720 portrait, full viewport hero */
-            --img-mid: url("assets/miata-front.jpg");       /* 5800×3700 landscape, wide visual band */
-            --img-footer: url("assets/shadow_car2.jpg");       /* 3485×2178 landscape, shorter CTA strip */
+            --img-mid: url("assets/miata-front.png");       /* 5800×3700 landscape, wide visual band */
+            --img-footer: url("assets/car_in_garage.jpg");       /* 3485×2178 landscape, shorter CTA strip */
         }
 
         *,
@@ -777,67 +777,74 @@
             onScroll();
 
             // #region agent log
+            function __dbg(hypothesisId, location, message, data) {
+                fetch('http://127.0.0.1:7336/ingest/e269b73e-4da6-4db2-936b-3b3c7ea76c96', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '132ee5' },
+                    body: JSON.stringify({
+                        sessionId: '132ee5',
+                        runId: 'pre-fix',
+                        hypothesisId: hypothesisId,
+                        location: location,
+                        message: message,
+                        data: data,
+                        timestamp: Date.now()
+                    })
+                }).catch(function () {});
+            }
+
             requestAnimationFrame(function () {
-                var bandEl = document.getElementById('experience');
-                var bgWrap = document.querySelector('.visual-band-bg');
                 var mid = document.getElementById('midPhoto');
-                if (bgWrap) {
-                    var afterCs = getComputedStyle(bgWrap, '::after');
-                    __dbg(
-                        'A',
-                        'home/index.html:visual-band',
-                        'computed .visual-band-bg::after',
-                        {
-                            backgroundImage: String(afterCs.backgroundImage).slice(0, 260),
-                            display: afterCs.display,
-                            content: afterCs.content,
-                            opacity: afterCs.opacity,
-                            height: afterCs.height
-                        },
-                        'post-fix-v1'
-                    );
-                } else {
-                    __dbg('A', 'home/index.html:visual-band', 'missing .visual-band-bg', {}, 'post-fix-v1');
-                }
+                var pagePath = location.pathname;
+                var resolvedMid = new URL('assets/miata-front.jpg', location.href).href;
+                var resolvedHero = new URL('assets/car_side_on_dark.jpg', location.href).href;
+
+                __dbg('A', 'index.html:paths', 'resolved asset URLs', {
+                    pagePath: pagePath,
+                    href: location.href.slice(0, 120),
+                    resolvedMid: resolvedMid,
+                    resolvedHero: resolvedHero
+                });
+
                 if (mid) {
                     var midCs = getComputedStyle(mid);
-                    __dbg(
-                        'B',
-                        'home/index.html:midPhoto',
-                        'computed #midPhoto',
-                        {
-                            backgroundImage: String(midCs.backgroundImage).slice(0, 260),
-                            opacity: midCs.opacity,
-                            transform: midCs.transform
-                        },
-                        'post-fix-v1'
-                    );
-                } else {
-                    __dbg('B', 'home/index.html:midPhoto', 'missing #midPhoto', {}, 'post-fix-v1');
+                    __dbg('B', 'index.html:midPhoto', 'computed #midPhoto styles', {
+                        backgroundImage: String(midCs.backgroundImage).slice(0, 300),
+                        opacity: midCs.opacity,
+                        transform: midCs.transform,
+                        backgroundPosition: midCs.backgroundPosition
+                    });
                 }
-                if (bandEl) {
-                    var r = bandEl.getBoundingClientRect();
-                    __dbg(
-                        'C',
-                        'home/index.html:#experience',
-                        'visual-band layout',
-                        {
-                            width: Math.round(r.width),
-                            height: Math.round(r.height),
-                            top: Math.round(r.top)
-                        },
-                        'post-fix-v1'
-                    );
-                } else {
-                    __dbg('C', 'home/index.html:#experience', 'missing #experience', {}, 'post-fix-v1');
-                }
-                __dbg(
-                    'D',
-                    'home/index.html:fade',
-                    'protocol',
-                    { href: String(location.href).slice(0, 80) },
-                    'post-fix-v1'
-                );
+
+                ['assets/miata-front.jpg', 'assets/car_side_on_dark.jpg'].forEach(function (rel, i) {
+                    var abs = new URL(rel, location.href).href;
+                    fetch(abs, { method: 'HEAD' }).then(function (res) {
+                        __dbg(i === 0 ? 'C' : 'D', 'index.html:fetch', 'HEAD asset', {
+                            url: abs,
+                            status: res.status,
+                            ok: res.ok,
+                            contentLength: res.headers.get('content-length')
+                        });
+                    }).catch(function (err) {
+                        __dbg(i === 0 ? 'C' : 'D', 'index.html:fetch', 'HEAD asset failed', {
+                            url: abs,
+                            error: String(err).slice(0, 120)
+                        });
+                    });
+
+                    var probe = new Image();
+                    probe.onload = function () {
+                        __dbg(i === 0 ? 'E' : 'F', 'index.html:image', 'Image.onload', {
+                            url: abs,
+                            naturalWidth: probe.naturalWidth,
+                            naturalHeight: probe.naturalHeight
+                        });
+                    };
+                    probe.onerror = function () {
+                        __dbg(i === 0 ? 'E' : 'F', 'index.html:image', 'Image.onerror', { url: abs });
+                    };
+                    probe.src = abs;
+                });
             });
             // #endregion
 
